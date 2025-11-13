@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DealHawk | Sandbox Demo</title>
+    <meta
+      name="description"
+      content="Probiere DealHawk sofort mit simulierten Produkten, Preisen und Margen aus – komplett ohne echte Unternehmensdaten."
+    />
+    <link rel="stylesheet" href="assets/css/main.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav>
+        <div class="brand-cluster">
+          <a class="logo" href="index.html">
+            <span class="logo-mark">DH</span>
+            DealHawk
+          </a>
+          <a
+            class="ata-link"
+            href="https://www.atabuy.de"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            An Atabuy Company
+          </a>
+        </div>
+        <div class="nav-links">
+          <a href="demo.html">Demo</a>
+          <a href="index.html#features">Produkt</a>
+          <a href="index.html#metrics">Impact</a>
+          <a href="index.html#platform">Plattform</a>
+          <a href="index.html#contact">Kontakt</a>
+        </div>
+        <div class="header-cta">
+          <a class="btn btn-ghost" href="auth.html">Login</a>
+          <a class="btn btn-primary" href="#samples">Demo-Module</a>
+        </div>
+      </nav>
+    </header>
+
+    <main class="wrapper">
+      <section class="demo-hero">
+        <div>
+          <span class="label-pill">Sandbox Modus</span>
+          <h1>DealHawk Demo mit fiktiven Produkten</h1>
+          <p>
+            Diese Umgebung zeigt dir live, wie unser KI-Agent Sortimente analysiert,
+            Margen berechnet und Preisempfehlungen ausspricht. Alle Daten sind
+            vollständig simuliert und können ohne Zugangsdaten getestet werden.
+          </p>
+          <ul class="hero-list">
+            <li><span></span>Keine Registrierung, keine Datenübertragung</li>
+            <li><span></span>Sofort einsatzbereit mit Branchen-Presets</li>
+            <li><span></span>API- und Decision-Boards als Mock</li>
+          </ul>
+          <div class="cta-buttons">
+            <a class="btn btn-primary" href="#samples">Demo-Module erkunden</a>
+            <a class="btn btn-ghost" href="index.html#contact"
+              >Live-Daten anfragen</a
+            >
+          </div>
+          <p class="demo-note">
+            Hinweis: Alle Werte, Firmen und Preise sind fiktiv. Sie dienen nur der
+            Illustration der KI-Workflows.
+          </p>
+        </div>
+        <div class="sample-card">
+          <h3>Top-Sortiment (synthetisch)</h3>
+          <p>Branche: Consumer Electronics · Region: DACH</p>
+          <ul>
+            <li>
+              <strong>NeonPulse Headset</strong>
+              <span>Ø Marge: 34,2%</span>
+            </li>
+            <li>
+              <strong>QuantumDock Pro</strong>
+              <span>Ø Marge: 29,8%</span>
+            </li>
+            <li>
+              <strong>HelixCam Mini</strong>
+              <span>Ø Marge: 22,1%</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section id="samples" class="demo-grid">
+        <article class="demo-module">
+          <h3>Produkt-Liste</h3>
+          <p>Explore 120+ simulierte Artikel mit Wettbewerbs- und Lieferdaten.</p>
+          <div class="data-table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Produkt</th>
+                  <th>Einkauf (€)</th>
+                  <th>Verkauf (€)</th>
+                  <th>Marge</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>FluxBoard Nano</td>
+                  <td>142,00</td>
+                  <td>219,00</td>
+                  <td class="positive">+35%</td>
+                  <td><span class="badge">Pushen</span></td>
+                </tr>
+                <tr>
+                  <td>Orion Brew Kit</td>
+                  <td>38,50</td>
+                  <td>59,90</td>
+                  <td class="positive">+28%</td>
+                  <td><span class="badge badge-warn">Beobachten</span></td>
+                </tr>
+                <tr>
+                  <td>HelixCam Mini</td>
+                  <td>64,10</td>
+                  <td>95,00</td>
+                  <td class="positive">+32%</td>
+                  <td><span class="badge">Pushen</span></td>
+                </tr>
+                <tr>
+                  <td>LumenGrow Panel</td>
+                  <td>118,00</td>
+                  <td>149,00</td>
+                  <td class="neutral">+21%</td>
+                  <td><span class="badge badge-muted">Neutral</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+        <article class="demo-module">
+          <h3>Preis-Simulation</h3>
+          <p>Ändere Parameter und sieh die Auswirkung auf die Zielmarge.</p>
+          <div class="sample-card compact">
+            <label for="priceRange">Verkaufspreis</label>
+            <input
+              id="priceRange"
+              type="range"
+              min="80"
+              max="220"
+              value="150"
+              step="5"
+            />
+            <p class="sim-output">
+              Preis: <span id="priceValue">150 €</span> · Erwartete Marge:
+              <strong id="marginValue">+27%</strong>
+            </p>
+            <p class="demo-note">
+              Berechnung basiert auf fiktiven Wettbewerbspreisen &amp; Supplier SLAs.
+            </p>
+          </div>
+        </article>
+        <article class="demo-module">
+          <h3>Lieferanten-Insights</h3>
+          <p>Mock-API zeigt durchschnittliche Lead Times &amp; MOQ.</p>
+          <div class="sample-card compact">
+            <ul>
+              <li>
+                <strong>Cobalt Manufacturing</strong>
+                <span>MOQ 500 · Lead 12 Tage · Qualitäts-Score 9/10</span>
+              </li>
+              <li>
+                <strong>Nova Supply</strong>
+                <span>MOQ 150 · Lead 7 Tage · Qualitäts-Score 8/10</span>
+              </li>
+              <li>
+                <strong>Orbit Trading</strong>
+                <span>MOQ 300 · Lead 18 Tage · Qualitäts-Score 7/10</span>
+              </li>
+            </ul>
+          </div>
+        </article>
+        <article class="demo-module">
+          <h3>API Playground</h3>
+          <p>Beispiel-Response mit anonymisierten Demo-Deals.</p>
+          <pre class="code-block">
+GET /demo/deals?region=EU
+[
+  {
+    "product": "FluxBoard Nano",
+    "targetMargin": 0.34,
+    "status": "push"
+  },
+  {
+    "product": "Orion Brew Kit",
+    "targetMargin": 0.25,
+    "status": "watch"
+  }
+]
+          </pre>
+          <a class="btn btn-ghost" href="#">OpenAPI ansehen</a>
+        </article>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrapper">
+        <div>
+          <div class="logo">
+            <span class="logo-mark">DH</span>
+            DealHawk
+          </div>
+          <p>Futuristische KI-Commerce-Steuerung für ambitionierte Unternehmen.</p>
+        </div>
+        <div class="footer-nav">
+          <a href="demo.html">Demo</a>
+          <a href="index.html#features">Produkt</a>
+          <a href="auth.html">Login</a>
+          <a href="index.html#contact">Kontakt</a>
+          <a href="datenschutz.html">Datenschutz</a>
+        </div>
+        <span><span id="year"></span> · An Atabuy Company</span>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+      const range = document.getElementById("priceRange");
+      const priceValue = document.getElementById("priceValue");
+      const marginValue = document.getElementById("marginValue");
+      if (range) {
+        range.addEventListener("input", (event) => {
+          const value = Number(event.target.value);
+          priceValue.textContent = `${value} €`;
+          const margin = Math.max(12, Math.min(38, Math.round((value - 90) / 4)));
+          marginValue.textContent = `+${margin}%`;
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DealHawk | Login &amp; Registrierung</title>
+    <meta
+      name="description"
+      content="Melde dich bei DealHawk an oder registriere dein Unternehmen, um deinen KI-Agenten für Gewinnmargen und Produkt-Sourcing zu aktivieren."
+    />
+    <link rel="stylesheet" href="assets/css/main.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <nav>
+        <div class="brand-cluster">
+          <a class="logo" href="index.html">
+            <span class="logo-mark">DH</span>
+            DealHawk
+          </a>
+          <a
+            class="ata-link"
+            href="https://www.atabuy.de"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            An Atabuy Company
+          </a>
+        </div>
+        <div class="nav-links">
+          <a href="demo.html">Demo</a>
+          <a href="index.html#features">Produkt</a>
+          <a href="index.html#metrics">Impact</a>
+          <a href="index.html#contact">Kontakt</a>
+        </div>
+        <div class="header-cta">
+          <a class="btn btn-ghost" href="index.html">Zurück zur Homepage</a>
+        </div>
+      </nav>
+    </header>
+
+    <div class="wrapper">
+      <p class="demo-note" style="text-align: center; margin-top: 20px">
+        Nur ausprobieren? <a href="demo.html">Zur Sandbox-Demo mit Beispieldaten ↗</a>
+      </p>
+      <section class="auth-grid">
+        <article class="auth-card">
+          <h2>Login</h2>
+          <p class="form-hint">
+            Sichere Anmeldung mit SSO, 2FA und richtlinienkonformen Sessions.
+          </p>
+          <div class="social-row">
+            <button class="social-btn" type="button">
+              🔐 Azure AD
+            </button>
+            <button class="social-btn" type="button">
+              🟦 Microsoft 365
+            </button>
+            <button class="social-btn" type="button">
+              🟢 Google Workspace
+            </button>
+          </div>
+          <div class="divider">oder E-Mail Login</div>
+          <form novalidate>
+            <label for="login-email">E-Mail</label>
+            <input
+              class="input"
+              type="email"
+              id="login-email"
+              placeholder="team@unternehmen.de"
+              required
+            />
+            <label for="login-passwort">Passwort</label>
+            <input
+              class="input"
+              type="password"
+              id="login-passwort"
+              placeholder="••••••••"
+              required
+            />
+            <label for="login-workspace">Workspace</label>
+            <input
+              class="input"
+              type="text"
+              id="login-workspace"
+              placeholder="unternehmen.dealhawk.cloud"
+              required
+            />
+            <div class="form-row">
+              <label class="checkbox">
+                <input type="checkbox" name="remember" />
+                <span>Angemeldet bleiben</span>
+              </label>
+              <a class="muted-link" href="#">2FA verwalten</a>
+            </div>
+            <div class="form-row">
+              <button class="btn btn-primary" type="submit">Anmelden</button>
+              <a class="muted-link" href="#">Passwort vergessen?</a>
+            </div>
+          </form>
+        </article>
+
+        <article class="auth-card">
+          <h2>Registrierung</h2>
+          <p class="form-hint">
+            Richte deinen DealHawk-Mandanten in weniger als 5 Minuten ein – ganz
+            ohne Kreditkarte.
+          </p>
+          <form novalidate>
+            <div class="form-row">
+              <div style="flex: 1">
+                <label for="reg-name">Vor- &amp; Nachname</label>
+                <input
+                  class="input"
+                  type="text"
+                  id="reg-name"
+                  placeholder="Alex Beispiel"
+                  required
+                />
+              </div>
+              <div style="flex: 1">
+                <label for="reg-role">Rolle</label>
+                <input
+                  class="input"
+                  type="text"
+                  id="reg-role"
+                  placeholder="z. B. Head of Commerce"
+                />
+              </div>
+            </div>
+            <div class="form-row">
+              <div style="flex: 1">
+                <label for="reg-company">Unternehmen</label>
+                <input
+                  class="input"
+                  type="text"
+                  id="reg-company"
+                  placeholder="An Atabuy Company"
+                  required
+                />
+              </div>
+              <div style="flex: 1">
+                <label for="team-size">Teamgröße</label>
+                <select class="input" id="team-size">
+                  <option>5-20 Mitglieder</option>
+                  <option>21-100 Mitglieder</option>
+                  <option>101-500 Mitglieder</option>
+                  <option>500+ Mitglieder</option>
+                </select>
+              </div>
+            </div>
+            <label for="reg-email">Business E-Mail</label>
+            <input
+              class="input"
+              type="email"
+              id="reg-email"
+              placeholder="finance@unternehmen.de"
+              required
+            />
+            <label for="reg-passwort">Passwort</label>
+            <input
+              class="input"
+              type="password"
+              id="reg-passwort"
+              placeholder="Mindestens 10 Zeichen"
+              required
+            />
+            <div class="password-meter">
+              <span id="passwordStrength"></span>
+            </div>
+            <ul class="requirements" id="passwordRequirements">
+              <li data-rule="length">Mindestens 10 Zeichen</li>
+              <li data-rule="case">Groß- &amp; Kleinbuchstaben</li>
+              <li data-rule="number">Mindestens eine Zahl</li>
+              <li data-rule="special">Ein Sonderzeichen</li>
+            </ul>
+            <div class="form-row">
+              <button class="btn btn-ghost" type="button">Einladung senden</button>
+              <button class="btn btn-primary" type="submit">
+                Unternehmen anlegen
+              </button>
+            </div>
+            <p class="muted-link">
+              Mit der Registrierung akzeptierst du unsere
+              <a href="#">Nutzungsbedingungen</a> und <a href="#">Datenschutz</a>.
+            </p>
+          </form>
+        </article>
+      </section>
+
+      <section class="auth-highlight">
+        <h3>Enterprise-Ready in jedem Detail</h3>
+        <p>
+          DealHawk erfüllt die Sicherheits- und Datenschutzanforderungen
+          führender Unternehmensgruppen. Unser Team unterstützt bei Due-Diligence
+          und Architektur-Reviews.
+        </p>
+        <div class="mini-card">
+          <strong>Security Controls:</strong> SSO (Azure AD, Okta, Google), SCIM,
+          RBAC, kundeneigene Verschlüsselungsschlüssel, EU-only Hosting.
+        </div>
+        <ul>
+          <li>Live-Monitoring &amp; Audit-Export im Admin Center</li>
+          <li>Mandantenfähiges Datenmodell mit granularen Policies</li>
+          <li>Dediziertes Customer-Success-Team für Rollouts</li>
+        </ul>
+      </section>
+
+      <section class="auth-banner">
+        <h4>Bereit für den DealHawk-Start?</h4>
+        <div class="support-grid">
+          <article class="support-card">
+            <h5>Onboarding Call</h5>
+            <p>Live-Demo mit einem KI-Commerce-Spezialisten innerhalb von 24h.</p>
+            <a href="#">Slot buchen ↗</a>
+          </article>
+          <article class="support-card">
+            <h5>Security Briefing</h5>
+            <p>
+              Erhalte das komplette Security-Dossier inkl. Architektur-Blueprint.
+            </p>
+            <a href="#">PDF anfordern ↗</a>
+          </article>
+          <article class="support-card">
+            <h5>Support Hotline</h5>
+            <p>Enterprise-SLA mit 24/7 Incident Desk und dediziertem CSM.</p>
+            <a href="mailto:support@dealhawk.ai">support@dealhawk.ai</a>
+          </article>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <div class="wrapper">
+        <div>
+          <div class="logo">
+            <span class="logo-mark">DH</span>
+            DealHawk
+          </div>
+          <p>Futuristische KI-Commerce-Steuerung für ambitionierte Unternehmen.</p>
+        </div>
+        <div class="footer-nav">
+          <a href="demo.html">Demo</a>
+          <a href="index.html#features">Produkt</a>
+          <a href="index.html#platform">Plattform</a>
+          <a href="index.html#contact">Kontakt</a>
+          <a href="datenschutz.html">Datenschutz</a>
+        </div>
+        <span><span id="year"></span> · An Atabuy Company</span>
+      </div>
+    </footer>
+    <script>
+      document.getElementById("year").textContent = new Date().getFullYear();
+
+      (function initPasswordMeter() {
+        const passwordInput = document.getElementById("reg-passwort");
+        const meterFill = document.getElementById("passwordStrength");
+        const requirementItems = document.querySelectorAll(
+          "#passwordRequirements li"
+        );
+        if (!passwordInput || !meterFill || !requirementItems.length) return;
+
+        function evaluatePassword(value) {
+          const checks = {
+            length: value.length >= 10,
+            case: /[a-z]/.test(value) && /[A-Z]/.test(value),
+            number: /\d/.test(value),
+            special: /[^A-Za-z0-9]/.test(value),
+          };
+          const passed = Object.values(checks).filter(Boolean).length;
+          requirementItems.forEach((item) => {
+            const rule = item.getAttribute("data-rule");
+            item.classList.toggle("met", checks[rule]);
+          });
+          const width = Math.max(10, (passed / 4) * 100);
+          meterFill.style.width = `${width}%`;
+        }
+
+        passwordInput.addEventListener("input", (event) => {
+          evaluatePassword(event.target.value);
+        });
+      })();
+    </script>
+  </body>
+</html>
