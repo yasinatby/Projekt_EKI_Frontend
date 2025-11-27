@@ -4,43 +4,97 @@ import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { ResultCard, type SearchResult } from "@/components/ResultCard";
 
-const PLATFORM_OPTIONS = ["eBay", "Kleinanzeigen", "Vinted", "Amazon"] as const;
-type Platform = (typeof PLATFORM_OPTIONS)[number];
+const PLATFORM_OPTIONS = [
+  { label: "eBay", value: "ebay" },
+  { label: "Kleinanzeigen", value: "kleinanzeigen" },
+  { label: "Vinted", value: "vinted" },
+  { label: "Amazon", value: "amazon" },
+] as const;
+
+type PlatformValue = (typeof PLATFORM_OPTIONS)[number]["value"];
 type SortKey = "score" | "margin";
+
+type PlatformFeeBreakdown = {
+  platform: string;
+  fee: number;
+  net_proceeds?: number;
+  currency?: string;
+};
+
+type AnalysisSummary = {
+  avg_price?: number;
+  median_price?: number;
+  min_price?: number;
+  max_price?: number;
+  suggested_vkp?: number;
+  weighted_average?: number;
+  target_margin_vkp?: number;
+  manual_vkp_margin?: number;
+  manual_vkp_net?: number;
+  cheapest_price?: number;
+  highest_price?: number;
+  total_results?: number;
+  currency?: string;
+  platform_fees?: PlatformFeeBreakdown[];
+};
+
+type SearchResponse =
+  | SearchResult[]
+  | {
+      results?: SearchResult[];
+      analysis?: AnalysisSummary | null;
+      message?: string;
+    };
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000/api/search";
+
+const DEFAULT_PLATFORM_STATE: Record<PlatformValue, boolean> = {
+  ebay: true,
+  kleinanzeigen: true,
+  vinted: false,
+  amazon: false,
+};
+
+const isNumber = (value: unknown): value is number =>
+  typeof value === "number" && Number.isFinite(value);
 
 export default function HomePage() {
   const [query, setQuery] = useState("");
   const [manualVkp, setManualVkp] = useState("");
   const [targetMargin, setTargetMargin] = useState("25");
-  const [platforms, setPlatforms] = useState<Record<Platform, boolean>>({
-    eBay: true,
-    Kleinanzeigen: true,
-    Vinted: false,
-    Amazon: false,
-  });
+  const [platforms, setPlatforms] =
+    useState<Record<PlatformValue, boolean>>(DEFAULT_PLATFORM_STATE);
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [analysis, setAnalysis] = useState<AnalysisSummary | null>(null);
+  const [lastQuery, setLastQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<SortKey>("score");
   const [hasSearched, setHasSearched] = useState(false);
 
-  const activePlatforms = useMemo<Platform[]>(
-    () => PLATFORM_OPTIONS.filter((platform) => platforms[platform]),
+  const activePlatforms = useMemo<PlatformValue[]>(
+    () =>
+      PLATFORM_OPTIONS.filter((platform) => platforms[platform.value]).map(
+        (platform) => platform.value
+      ),
     [platforms]
   );
 
   const sortedResults = useMemo(() => {
     const sorted = [...results];
-    sorted.sort((a, b) =>
-      sortBy === "score" ? b.score - a.score : b.margin - a.margin
-    );
+    sorted.sort((a, b) => {
+      const first = sortBy === "score" ? a.score ?? 0 : a.margin ?? 0;
+      const second = sortBy === "score" ? b.score ?? 0 : b.margin ?? 0;
+      return second - first;
+    });
     return sorted;
   }, [results, sortBy]);
 
-  const handlePlatformToggle = (platform: Platform) => {
+  const isSearchDisabled =
+    loading || query.trim().length === 0 || activePlatforms.length === 0;
+
+  const handlePlatformToggle = (platform: PlatformValue) => {
     setPlatforms((prev) => ({ ...prev, [platform]: !prev[platform] }));
   };
 
@@ -50,20 +104,36 @@ export default function HomePage() {
     return Number.isNaN(parsed) ? undefined : parsed;
   };
 
+  const formatPrice = (value?: number | null) => {
+    const priceValue = value ?? null;
+    if (!isNumber(priceValue)) return "–";
+    return `${priceValue.toFixed(0)} ${analysis?.currency ?? "€"}`;
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!query.trim()) {
+      setError("Bitte einen Suchbegriff eingeben.");
+      return;
+    }
+
+    if (activePlatforms.length === 0) {
+      setError("Bitte mindestens eine Plattform auswählen.");
+      return;
+    }
+
     setHasSearched(true);
     setError(null);
     setLoading(true);
 
-    try {
-      const payload = {
-        query: query.trim(),
-        manual_vkp: getNumericValue(manualVkp),
-        target_margin: getNumericValue(targetMargin),
-        platforms: activePlatforms,
-      };
+    const payload = {
+      query: query.trim(),
+      manual_vkp: getNumericValue(manualVkp) ?? null,
+      target_margin: getNumericValue(targetMargin) ?? null,
+      platforms: activePlatforms,
+    };
 
+    try {
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -74,12 +144,28 @@ export default function HomePage() {
         throw new Error(`API Error: ${response.status}`);
       }
 
-      const data: SearchResult[] = await response.json();
-      setResults(Array.isArray(data) ? data : []);
+      const data: SearchResponse = await response.json();
+      let parsedResults: SearchResult[] = [];
+      let parsedAnalysis: AnalysisSummary | null = null;
+
+      if (Array.isArray(data)) {
+        parsedResults = data;
+      } else {
+        parsedResults = data.results ?? [];
+        parsedAnalysis = data.analysis ?? null;
+        if (data.message) {
+          setError(data.message);
+        }
+      }
+
+      setResults(parsedResults);
+      setAnalysis(parsedAnalysis);
+      setLastQuery(payload.query);
     } catch (err) {
       console.error(err);
       setError("Beim Abrufen der Ergebnisse ist ein Fehler aufgetreten.");
       setResults([]);
+      setAnalysis(null);
     } finally {
       setLoading(false);
     }
@@ -178,29 +264,145 @@ export default function HomePage() {
 
             <button
               type="submit"
-              className="w-full rounded-2xl bg-sky-500 px-6 py-3 text-base font-semibold text-slate-900 shadow-lg shadow-sky-500/40 transition hover:bg-sky-400 lg:w-auto"
+              disabled={isSearchDisabled}
+              className="w-full rounded-2xl bg-sky-500 px-6 py-3 text-base font-semibold text-slate-900 shadow-lg shadow-sky-500/40 transition hover:bg-sky-400 disabled:cursor-not-allowed disabled:opacity-60 lg:w-auto"
             >
-              Deals finden
+              {loading ? "Wird geladen..." : "Deals finden"}
             </button>
           </form>
 
-          <div className="mt-5 grid gap-3 text-xs uppercase tracking-[0.3em] text-slate-500 sm:grid-cols-4">
+          <div className="mt-5 grid gap-3 text-xs uppercase tracking-[0.3em] text-slate-500 sm:grid-cols-2 lg:grid-cols-4">
             {PLATFORM_OPTIONS.map((platform) => (
               <label
-                key={platform}
+                key={platform.value}
                 className="flex cursor-pointer items-center gap-2 rounded-2xl border border-slate-700/70 bg-slate-900/40 px-4 py-3 text-[0.7rem] font-semibold transition hover:border-sky-400 hover:text-sky-200"
               >
                 <input
                   type="checkbox"
-                  checked={platforms[platform]}
-                  onChange={() => handlePlatformToggle(platform)}
+                  checked={platforms[platform.value]}
+                  onChange={() => handlePlatformToggle(platform.value)}
                   className="h-4 w-4 rounded border-slate-700 bg-slate-900 text-sky-400 focus:ring-sky-500"
                 />
-                {platform}
+                {platform.label}
               </label>
             ))}
           </div>
         </motion.section>
+
+        {analysis && (
+          <motion.section
+            layout
+            className="mb-10 rounded-3xl border border-slate-700/60 bg-slate-900/70 p-6 shadow-lg shadow-slate-900/40 backdrop-blur"
+          >
+            <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-xs uppercase tracking-[0.4em] text-slate-500">
+                  Marktanalyse
+                </p>
+                <h2 className="mt-1 text-2xl font-semibold text-slate-50">
+                  {lastQuery || "Letzte Suche"}
+                </h2>
+                {isNumber(analysis.total_results) && (
+                  <p className="text-sm text-slate-400">
+                    {analysis.total_results} Treffer über alle Plattformen
+                  </p>
+                )}
+              </div>
+              {isNumber(analysis.suggested_vkp) && (
+                <div className="rounded-2xl border border-sky-500/40 bg-sky-500/10 px-4 py-3 text-right">
+                  <p className="text-xs uppercase tracking-[0.3em] text-sky-200">
+                    Empfohlener VKP
+                  </p>
+                  <p className="text-3xl font-semibold text-slate-50">
+                    {formatPrice(analysis.suggested_vkp)}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              {[
+                { label: "Durchschnitt", value: analysis.avg_price },
+                { label: "Median", value: analysis.median_price },
+                { label: "Günstigster", value: analysis.min_price ?? analysis.cheapest_price },
+                { label: "Teuerster", value: analysis.max_price ?? analysis.highest_price },
+                { label: "Weighted Avg", value: analysis.weighted_average },
+                { label: "Ziel VKP", value: analysis.target_margin_vkp },
+              ]
+                .filter((stat) => isNumber(stat.value))
+                .map((stat) => (
+                  <div
+                    key={stat.label}
+                    className="rounded-2xl border border-slate-800/70 bg-slate-900/60 px-4 py-5"
+                  >
+                    <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
+                      {stat.label}
+                    </p>
+                    <p className="mt-2 text-2xl font-semibold text-slate-50">
+                      {formatPrice(stat.value)}
+                    </p>
+                  </div>
+                ))}
+            </div>
+
+            {analysis.platform_fees && analysis.platform_fees.length > 0 && (
+              <div className="mt-6">
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-500">
+                  Gebührenabschätzung
+                </p>
+                <div className="mt-3 grid gap-3 md:grid-cols-2">
+                  {analysis.platform_fees.map((entry) => (
+                    <div
+                      key={entry.platform}
+                      className="rounded-2xl border border-slate-800/80 bg-slate-900/60 px-4 py-4"
+                    >
+                      <div className="flex items-center justify-between text-sm text-slate-300">
+                        <span className="font-semibold capitalize">
+                          {entry.platform}
+                        </span>
+                        <span className="text-slate-400">
+                          Gebühren: {entry.fee.toFixed(2)}{" "}
+                          {entry.currency ?? analysis.currency ?? "€"}
+                        </span>
+                      </div>
+                      {isNumber(entry.net_proceeds) && (
+                        <p className="mt-1 text-xs text-slate-500">
+                          Nettoerlös: {formatPrice(entry.net_proceeds)}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {(isNumber(analysis.manual_vkp_margin) ||
+              isNumber(analysis.manual_vkp_net)) && (
+              <div className="mt-6 grid gap-4 md:grid-cols-2">
+                {isNumber(analysis.manual_vkp_margin) && (
+                  <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-4">
+                    <p className="text-xs uppercase tracking-[0.3em] text-emerald-200">
+                      Marge bei manuellem VKP
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold text-emerald-100">
+                      {analysis.manual_vkp_margin.toFixed(1)}%
+                    </p>
+                  </div>
+                )}
+                {isNumber(analysis.manual_vkp_net) && (
+                  <div className="rounded-2xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-4">
+                    <p className="text-xs uppercase tracking-[0.3em] text-cyan-200">
+                      Nettoerlös
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold text-cyan-100">
+                      {formatPrice(analysis.manual_vkp_net)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </motion.section>
+        )}
 
         <main>
           {loading && (

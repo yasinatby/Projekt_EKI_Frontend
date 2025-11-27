@@ -1,5 +1,6 @@
 'use client';
 
+import Image from "next/image";
 import { motion } from "framer-motion";
 
 export interface SearchResult {
@@ -7,8 +8,13 @@ export interface SearchResult {
   price: number;
   platform: string;
   url: string;
-  margin: number;
-  score: number;
+  image?: string | null;
+  location?: string | null;
+  condition?: string | null;
+  seller?: string | null;
+  margin?: number | null;
+  score?: number | null;
+  currency?: string | null;
 }
 
 interface ResultCardProps {
@@ -29,7 +35,11 @@ export function ResultCard({ result, index }: ResultCardProps) {
     platformColors[platformKey] ??
     "bg-slate-600/30 text-slate-200 border-slate-500/50";
 
-  const scoreWidth = Math.min(100, Math.max(0, result.score));
+  const currencySymbol = result.currency ?? "€";
+  const marginValue =
+    typeof result.margin === "number" ? result.margin : undefined;
+  const scoreValue = typeof result.score === "number" ? result.score : 0;
+  const scoreWidth = Math.min(100, Math.max(0, scoreValue));
 
   return (
     <motion.article
@@ -37,8 +47,22 @@ export function ResultCard({ result, index }: ResultCardProps) {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.04, type: "spring", stiffness: 120 }}
-      className="rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-lg shadow-slate-900/40 backdrop-blur"
+      className="flex flex-col gap-5 rounded-2xl border border-slate-700/60 bg-slate-900/70 p-5 shadow-lg shadow-slate-900/40 backdrop-blur"
     >
+      {result.image && (
+        <div className="relative h-48 overflow-hidden rounded-xl border border-slate-800/80 bg-slate-900/60">
+          <Image
+            src={result.image}
+            alt={result.title}
+            fill
+            sizes="(min-width: 768px) 50vw, 100vw"
+            className="object-cover object-center"
+            unoptimized
+            priority={index < 2}
+          />
+        </div>
+      )}
+
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs uppercase tracking-[0.3em] text-sky-300/70">
@@ -61,7 +85,7 @@ export function ResultCard({ result, index }: ResultCardProps) {
             Preis
           </dt>
           <dd className="text-xl font-semibold text-white">
-            {result.price.toFixed(2)} €
+            {result.price.toFixed(2)} {currencySymbol}
           </dd>
         </div>
         <div>
@@ -70,10 +94,14 @@ export function ResultCard({ result, index }: ResultCardProps) {
           </dt>
           <dd
             className={`text-xl font-semibold ${
-              result.margin >= 0 ? "text-emerald-300" : "text-rose-300"
+              marginValue === undefined
+                ? "text-slate-300"
+                : marginValue >= 0
+                  ? "text-emerald-300"
+                  : "text-rose-300"
             }`}
           >
-            {result.margin.toFixed(1)}%
+            {marginValue === undefined ? "–" : `${marginValue.toFixed(1)}%`}
           </dd>
         </div>
         <div>
@@ -81,7 +109,7 @@ export function ResultCard({ result, index }: ResultCardProps) {
             Score
           </dt>
           <dd className="text-xl font-semibold text-sky-200">
-            {Math.round(result.score)}
+            {Math.round(scoreValue)}
           </dd>
         </div>
       </dl>
@@ -99,13 +127,40 @@ export function ResultCard({ result, index }: ResultCardProps) {
         </div>
       </div>
 
+      <ul className="grid gap-3 text-sm text-slate-400 sm:grid-cols-3">
+        {result.location && (
+          <li className="rounded-xl border border-slate-800/80 bg-slate-900/60 px-3 py-2">
+            <p className="text-[0.65rem] uppercase tracking-[0.3em] text-slate-500">
+              Standort
+            </p>
+            <p className="mt-1 text-sm text-slate-200">{result.location}</p>
+          </li>
+        )}
+        {result.condition && (
+          <li className="rounded-xl border border-slate-800/80 bg-slate-900/60 px-3 py-2">
+            <p className="text-[0.65rem] uppercase tracking-[0.3em] text-slate-500">
+              Zustand
+            </p>
+            <p className="mt-1 text-sm text-slate-200">{result.condition}</p>
+          </li>
+        )}
+        {result.seller && (
+          <li className="rounded-xl border border-slate-800/80 bg-slate-900/60 px-3 py-2">
+            <p className="text-[0.65rem] uppercase tracking-[0.3em] text-slate-500">
+              Verkäufer
+            </p>
+            <p className="mt-1 text-sm text-slate-200">{result.seller}</p>
+          </li>
+        )}
+      </ul>
+
       <a
         href={result.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-500/80 px-4 py-2 font-semibold text-slate-900 shadow-lg shadow-sky-500/30 transition hover:bg-sky-400"
+        className="mt-auto inline-flex w-full items-center justify-center gap-2 rounded-xl bg-sky-500/80 px-4 py-2 font-semibold text-slate-900 shadow-lg shadow-sky-500/30 transition hover:bg-sky-400"
       >
-        Zum Angebot
+        Listing öffnen
         <span aria-hidden className="text-lg">
           ↗
         </span>
